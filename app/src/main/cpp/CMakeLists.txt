@@ -9,6 +9,11 @@ cmake_minimum_required(VERSION 3.10.2)
 
 project("purenativecalculatordemo")
 
+#for native activity
+add_library(native_app_glue STATIC
+        ${ANDROID_NDK}/sources/android/native_app_glue/android_native_app_glue.c)
+
+
 # Creates and names a library, sets it as either STATIC
 # or SHARED, and provides the relative paths to its source code.
 # You can define multiple libraries, and CMake builds them for you.
@@ -22,6 +27,12 @@ add_library( # Sets the name of the library.
 
              # Provides a relative path to your source file(s).
              native-lib.cpp )
+
+# set app-glue to native-lib
+target_include_directories(native-lib PRIVATE
+        ${ANDROID_NDK}/sources/android/native_app_glue)
+
+
 
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by
@@ -42,6 +53,10 @@ find_library( # Sets the name of the path variable.
 
 target_link_libraries( # Specifies the target library.
                        native-lib
+                        android
+                        native_app_glue
+                        EGL
+                        GLESv1_CM
 
                        # Links the target library to the log library
                        # included in the NDK.
