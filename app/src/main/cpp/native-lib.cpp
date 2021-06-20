@@ -237,6 +237,11 @@ static int engine_init_display(struct engine* engine) {
 
     auto opengl_info = {GL_VENDOR,GL_RENDERER,GL_VERSION,GL_EXTENSIONS};
 
+    for(auto name : opengl_info) {
+        auto info = glGetString(name);
+        LOGI("opengl info : %s",info);
+    }
+
     glHint(GL_PERSPECTIVE_CORRECTION_HINT,GL_FASTEST);
     glEnable(GL_CULL_FACE);
     glShadeModel(GL_SMOOTH);
@@ -413,6 +418,15 @@ ASensorManager* acquireASensorManagerInstance(android_app* app) {
         }
 
     }
+
+    //pointer-function
+    typedef ASensorManager *(*PF_GETINSTANCE)();
+    auto getInstanceFunc = (PF_GETINSTANCE)
+            dlsym(androidHandler,"ASensorManager_getInstance");
+    assert(getInstanceFunc);
+    dlclose(androidHandler);
+
+    return getInstanceFunc();
 
 }
 
