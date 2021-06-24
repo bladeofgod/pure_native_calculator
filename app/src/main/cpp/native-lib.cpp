@@ -10,6 +10,7 @@
 //draw ui
 #include <EGL/egl.h>
 #include <GLES/gl.h>
+#include "gl_painter.h"
 
 //relative android stuff
 #include <android/sensor.h>
