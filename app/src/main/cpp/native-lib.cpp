@@ -122,6 +122,10 @@ void android_main(struct android_app* state) {
 //                             event.acceleration.x,
 //                             event.acceleration.y,
 //                             event.acceleration.z);
+                        Painter_Color color = {
+                                220,20,60,1
+                        };
+                        drawRectWithText(color,"123");
                     }
                 }
             }
@@ -266,13 +270,13 @@ static void engine_draw_frame(struct engine * engine) {
     }
 
     //set pre-fill-color
-    glClearColor(((float )engine->state.x)/engine->width,
-                 engine->state.angle,
-                 ((float )engine->state.y)/engine->height,
-                 1);
+//    glClearColor(((float )engine->state.x)/engine->width,
+//                 engine->state.angle,
+//                 ((float )engine->state.y)/engine->height,
+//                 1);
 
     //white color
-    //glClearColor(255,255,255,1);
+    glClearColor(255,255,255,1);
 
     glClear(GL_COLOR_BUFFER_BIT);
 
@@ -312,6 +316,7 @@ static int32_t engine_handle_input(struct android_app* app, AInputEvent* event) 
         LOGI("input event : x=%i  y=%i",
              engine->state.x,
              engine->state.y);
+
         return 1;
     }
     return 0;

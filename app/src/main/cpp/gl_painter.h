@@ -13,7 +13,18 @@ struct Painter_Color{
 };
 
 void drawRectWithText(Painter_Color color , std::string text) {
+
+    const GLfloat triangleVertices[] = {
+            0.0, 1.0, -6.0,// Triangle top centre
+            -1.0, -1.0, -6.0,// bottom left
+            1.0, -1.0, -6.0// bottom right
+            };
+
     glColor4f(color.red,color.green,color.blue,color.alpha);
+    glVertexPointer(3,GL_FLOAT,0,triangleVertices);
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glDrawArrays(GL_TRIANGLES,0,9);
+    glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, triangleVertices);
 
 }
 
