@@ -107,17 +107,20 @@ void android_main(struct android_app* state) {
             }
 
             if(ident == LOOPER_ID_USER) {
-                //is user event data
+                //is user looper event data
+                // [accelerometerSenor] will detect state of motion,and finitely in this loop(while)
+                // but input-event can interrupt it shortly
                 if(engine.accelerometerSenor != nullptr) {
                     ASensorEvent   event;
                     while (ASensorEventQueue_getEvents(engine.sensorEventQueue,//add queue
                                                        &event,//event data
                                                        1)
                                                        > 0) {
-                        LOGI("accelerometer: x=%f   y=%f   z=%f",
-                             event.acceleration.x,
-                             event.acceleration.y,
-                             event.acceleration.z);
+                        //disable it , because will rush screen...
+//                        LOGI("accelerometer: x=%f   y=%f   z=%f",
+//                             event.acceleration.x,
+//                             event.acceleration.y,
+//                             event.acceleration.z);
                     }
                 }
             }
@@ -267,6 +270,9 @@ static void engine_draw_frame(struct engine * engine) {
                  ((float )engine->state.y)/engine->height,
                  1);
 
+    //white color
+    //glClearColor(255,255,255,1);
+
     glClear(GL_COLOR_BUFFER_BIT);
 
     eglSwapBuffers(engine->display,engine->surface);
@@ -302,6 +308,9 @@ static int32_t engine_handle_input(struct android_app* app, AInputEvent* event) 
         engine->animation = 1;
         engine->state.x = AMotionEvent_getX(event,0);
         engine->state.y = AMotionEvent_getY(event,0);
+        LOGI("input event : x=%i  y=%i",
+             engine->state.x,
+             engine->state.y);
         return 1;
     }
     return 0;
