@@ -14,11 +14,18 @@ struct Painter_Color{
 
 void drawRectWithText(Painter_Color color , std::string text) {
 
-    const GLfloat triangleVertices[] = {
-            0.0, 1.0, -6.0,// Triangle top centre
-            -1.0, -1.0, -6.0,// bottom left
-            1.0, -1.0, -6.0// bottom right
-            };
+//    const GLfloat triangleVertices[] = {
+//            0.0, 1.0, -6.0,// Triangle top centre
+//            -1.0, -1.0, -6.0,// bottom left
+//            1.0, -1.0, -6.0// bottom right
+//            };
+
+    GLint vertices[] = { 25, 25,
+                         100, 325,
+                         175, 25,
+                         175, 325,
+                         250, 25,
+                         325, 325 };
 
     glColor4f(color.red,color.green,color.blue,color.alpha);
     glVertexPointer(3,GL_FLOAT,0,triangleVertices);
@@ -27,6 +34,10 @@ void drawRectWithText(Painter_Color color , std::string text) {
     glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, triangleVertices);
 
 }
+
+
+
+
 
 
 #endif //PURENATIVECALCULATORDEMO_GL_PAINTER_H

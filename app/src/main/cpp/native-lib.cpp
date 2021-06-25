@@ -122,10 +122,10 @@ void android_main(struct android_app* state) {
 //                             event.acceleration.x,
 //                             event.acceleration.y,
 //                             event.acceleration.z);
-                        Painter_Color color = {
-                                220,20,60,1
-                        };
-                        drawRectWithText(color,"123");
+//                        Painter_Color color = {
+//                                220,20,60,1
+//                        };
+//                        drawRectWithText(color,"123");
                     }
                 }
             }
@@ -151,6 +151,19 @@ void android_main(struct android_app* state) {
     }
 
 }
+
+
+/*
+ * method function :
+ *
+ * 1. communicate with activity's window
+ * 2. query eglSurface's functional type&config
+ * 3. create eglSurface
+ * 4. sync all opengl api
+ * 5. manage resource like : texutre ...
+ *
+ *
+ */
 
 static int engine_init_display(struct engine* engine) {
 
@@ -243,6 +256,9 @@ static int engine_init_display(struct engine* engine) {
     engine->height = h;
     engine->state.angle = 0;
 
+    LOGI("egl surface size : width = %i  ,  height = %i",
+         w,h);
+
     auto opengl_info = {GL_VENDOR,GL_RENDERER,GL_VERSION,GL_EXTENSIONS};
 
     for(auto name : opengl_info) {
@@ -256,6 +272,58 @@ static int engine_init_display(struct engine* engine) {
     glDisable(GL_DEPTH_TEST);
 
     return 0;
+
+}
+
+/*
+ * init shader and link app
+ *
+ */
+
+void initShaderAndLink(struct engine* engine) {
+
+    char vShaderStr[] =
+            "#version 300 es                            \n"
+            "layout(location = 0) in vec4 vPosition;    \n"
+            "void main()                                \n"
+            "{                                          \n"
+            "   gl_Position = vPosition;                \n"
+            "}                                          \n";
+
+    char fShaderStr[] =
+            "#version 300 es                            \n"
+            "precision mediump float;                   \n"
+            "out vec4 fragColor;                        \n"
+            "void main()                                \n"
+            "{                                          \n"
+            "   fragColor = vec4(1.0, 0.0, 0.0, 1.0);   \n"
+            "}                                          \n";
+
+    GLuint vertexShader;
+    GLuint fragmentShader;
+    GLuint programObject;
+    GLuint linked;
+
+    //create shader
+    vertexShader = Load
+
+
+}
+
+/*
+ *
+ * @param type : shader's type    {VERTEX_SHADER,FRAGMENT_SHADER}
+ * @param shaderSrc : res code
+ *
+ */
+
+GLuint loadShader(GLenum type,const char* shaderSrc) {
+    GLuint shader;
+    GLint compiled;
+
+
+
+
 
 }
 
@@ -309,13 +377,29 @@ static void engine_term_display(struct engine* engine) {
 
 static int32_t engine_handle_input(struct android_app* app, AInputEvent* event) {
     auto *engine = (struct engine*)app->userData;
+
     if(AInputEvent_getType(event) == AINPUT_EVENT_TYPE_MOTION) {
-        engine->animation = 1;
-        engine->state.x = AMotionEvent_getX(event,0);
-        engine->state.y = AMotionEvent_getY(event,0);
-        LOGI("input event : x=%i  y=%i",
-             engine->state.x,
-             engine->state.y);
+        switch (AMotionEvent_getAction(event)) {
+            case AMOTION_EVENT_ACTION_DOWN:
+                engine->animation = 1;
+                engine->state.x = AMotionEvent_getX(event,0);
+                engine->state.y = AMotionEvent_getY(event,0);
+                LOGI("input event -> action down : x=%i  y=%i",
+                     engine->state.x,
+                     engine->state.y);
+                break;
+            case AMOTION_EVENT_ACTION_UP:
+                engine->animation = 1;
+                engine->state.x = AMotionEvent_getX(event,0);
+                engine->state.y = AMotionEvent_getY(event,0);
+                LOGI("input event -> action up : x=%i  y=%i",
+                     engine->state.x,
+                     engine->state.y);
+                break;
+
+        }
+
+
 
         return 1;
     }
