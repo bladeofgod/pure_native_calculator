@@ -9,15 +9,21 @@
 
 //draw ui
 #include <EGL/egl.h>
-#include <GLES/gl.h>
 #include "gl_painter.h"
+#include <GLES3/gl3.h>
+#include <GLES/gl.h>
+#include <GLES3/gl3ext.h>
+#include <GLES3/gl3platform.h>
+
 
 //relative android stuff
 #include <android/sensor.h>
 #include <android/log.h>
+
 #include "android_native_app_glue.h"
 
 #include "native_activity_method.h"
+
 
 #define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO,"calculator-activity",__VA_ARGS__))
 #define LOGE(...) ((void)__android_log_print(ANDROID_LOG_ERROR,"calculator-activity",__VA_ARGS__))
@@ -48,6 +54,8 @@ struct engine{
     int32_t     height;
 
     struct saved_state state;
+
+    GLuint programObject;
 
 };
 
@@ -143,7 +151,10 @@ void android_main(struct android_app* state) {
             if(engine.state.angle > 1 ) {
                 engine.state.angle = 0;
             }
-            engine_draw_frame(&engine);
+            //just bg
+            //engine_draw_frame(&engine);
+            //
+            gl_draw(&engine);
         }
 
 
@@ -178,6 +189,9 @@ static int engine_init_display(struct engine* engine) {
             EGL_RED_SIZE,8,
             EGL_NONE
     };
+
+    EGLint contextAttribs[] = { EGL_CONTEXT_CLIENT_VERSION, 3, EGL_NONE };
+
 
     EGLint w,h,format;
     EGLint numConfigs;
@@ -233,7 +247,7 @@ static int engine_init_display(struct engine* engine) {
 
     //create egl surface from activity's window
     surface = eglCreateWindowSurface(display,config,engine->app->window, nullptr);
-    context = eglCreateContext(display,config, nullptr, nullptr);
+    context = eglCreateContext(display,config, EGL_NO_CONTEXT, contextAttribs);
 
     //switch context,make sure. it will bind display&surface to context
     // than opengl's functions will work.
@@ -268,7 +282,7 @@ static int engine_init_display(struct engine* engine) {
 
     glHint(GL_PERSPECTIVE_CORRECTION_HINT,GL_FASTEST);
     glEnable(GL_CULL_FACE);
-    glShadeModel(GL_SMOOTH);
+    //glShadeModel(GL_SMOOTH);
     glDisable(GL_DEPTH_TEST);
 
     return 0;
@@ -280,7 +294,7 @@ static int engine_init_display(struct engine* engine) {
  *
  */
 
-void initShaderAndLink(struct engine* engine) {
+int initShaderAndLink(struct engine* engine) {
 
     char vShaderStr[] =
             "#version 300 es                            \n"
@@ -302,10 +316,48 @@ void initShaderAndLink(struct engine* engine) {
     GLuint vertexShader;
     GLuint fragmentShader;
     GLuint programObject;
-    GLuint linked;
+    GLint linked;
 
     //create shader
-    vertexShader = Load
+    vertexShader = loadShader(GL_VERTEX_SHADER,vShaderStr);
+    fragmentShader = loadShader(GL_FRAGMENT_SHADER,fShaderStr);
+
+    //program-object is a container,that can connect with shader and linked a program finally.
+
+    //create program obj
+    programObject = glCreateProgram();
+
+    if(programObject == 0){
+        return 0;
+    }
+
+    //link shader
+
+    glAttachShader(programObject,vertexShader);
+    glAttachShader(programObject,fragmentShader);
+
+    //link program
+    glLinkProgram(programObject);
+
+    //get program link status
+    glGetProgramiv(programObject, GL_LINK_STATUS, &linked);
+
+    if(!linked) {
+        GLint infoLen = 0;
+        glGetProgramiv(programObject, GL_INFO_LOG_LENGTH,&infoLen);
+        if(infoLen > 1){
+            char *infoLog = (char *)malloc(sizeof(char ) *infoLen);
+            glGetProgramInfoLog(programObject,infoLen,NULL,infoLog);
+            LOGE("error linking program : \n%s\n,",infoLog);
+            free(infoLog);
+        }
+        glDeleteProgram(programObject);
+        return 0;
+    }
+
+    engine->programObject = programObject;
+    glClearColor(1.0f,1.0f,1.0f,1.0f);
+    return 1;
 
 
 }
@@ -320,6 +372,43 @@ void initShaderAndLink(struct engine* engine) {
 GLuint loadShader(GLenum type,const char* shaderSrc) {
     GLuint shader;
     GLint compiled;
+
+    //create shader
+    shader = glCreateShader(type);
+    if(shader == 0) {
+        return 0;
+    }
+
+
+    // void glShaderSource (GLuint shader, GLsizei count, const GLchar *const*string, const GLint *length);
+    // count为着色器字符串数量；length为多个字符串的时候，指定各个字符串长度的一个数组，当count为1时其为NULL
+
+    // 2. 提供着色器源代码
+    glShaderSource(shader,1,&shaderSrc,NULL);
+    // 3. 编译着色器
+    glCompileShader(shader);
+    // 4. 查询编译信息
+    glGetShaderiv(shader,GL_SHADER_COMPILER,&compiled);
+
+    if(!compiled) {
+        GLint infoLen = 0;
+        //查询日志长度
+        glGetShaderiv(shader,GL_INFO_LOG_LENGTH,&infoLen);
+        if(infoLen > 1){
+            char *infoLog = (char *)malloc(sizeof(char ) *infoLen);
+            glGetShaderInfoLog(shader,infoLen,NULL,infoLog);
+            LOGE("error linking program : \n%s\n",infoLog);
+            //new 对象，必须delete删除，  malloc对象 必须 free
+            free(infoLog);
+        }
+        glDeleteShader(shader);
+        return 0;
+
+    }
+
+    return shader;
+
+
 
 
 
@@ -347,6 +436,37 @@ static void engine_draw_frame(struct engine * engine) {
     glClearColor(255,255,255,1);
 
     glClear(GL_COLOR_BUFFER_BIT);
+
+    eglSwapBuffers(engine->display,engine->surface);
+
+}
+
+static void gl_draw(struct engine *engine) {
+
+    ///三个顶点
+    GLfloat vVertices[] = {
+            0.0f, 0.5f, 0.0f,
+            -0.5f, -0.5f, 0.0f,
+            0.5f, -0.5f, 0.0f
+    };
+
+    // 1. 通知OpenGL ES用于绘制的2D渲染表面的原点(x,y)坐标，宽度和高度
+    glViewport(0,0,engine->width,engine->height);
+    // 2. 清除颜色缓冲区；有颜色、深度和模板缓冲区
+    glClear(GL_COLOR_BUFFER_BIT);
+    // 3. 将程序设置为活程序
+    glUseProgram(engine->programObject);
+    // void glVertexAttribPointer (GLuint index, GLint size, GLenum type, GLboolean normalized,
+    // GLsizei stride, const void *pointer);
+    // index为第几个属性，属性有顶点的位置为0/纹理为1/法线为3；size为一个顶点所有数据的个数，这里XYZ为3个；
+    // type为顶点描述数据的类型，这里为FLOAT；normalized为是否需要显卡把数据归一化到-1到+1区间，这里不需要为FALSE
+    // stride连续顶点属性之间的偏移量，0表示他们为紧密排列在一起的。pointer为顶点数组
+    // 4. 加载顶点位置到GL中
+    glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,0,vVertices);
+    // 5. 使用顶点数组顶点位置属性，也就是0属性；如果什么都不使用的话，就使用常量顶点属性0
+    glEnableVertexAttribArray(0);
+    // 6. 绘制三角形
+    glDrawArrays(GL_TRIANGLES, 0, 3);
 
     eglSwapBuffers(engine->display,engine->surface);
 
@@ -431,7 +551,14 @@ static void engine_handle_cmd(struct android_app* app,int32_t cmd) {
             if(engine->app->window != nullptr) {
                 //init egl display
                 engine_init_display(engine);
-                engine_draw_frame(engine);
+
+                if(!initShaderAndLink(engine)){
+                    break;
+                }
+
+                gl_draw(engine);
+                //draw a random color bg
+                //engine_draw_frame(engine);
 
             }
             break;

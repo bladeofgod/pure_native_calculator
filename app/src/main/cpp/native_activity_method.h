@@ -23,6 +23,10 @@ static void engine_draw_frame(struct engine * engine);
 //fetch sensor manager
 ASensorManager* acquireASensorManagerInstance(android_app* app);
 
+//
+GLuint loadShader(GLenum type,const char* shaderSrc);
+
+static void gl_draw(struct engine *engine);
 
 
 #endif //PURENATIVECALCULATORDEMO_NATIVE_ACTIVITY_METHOD_H

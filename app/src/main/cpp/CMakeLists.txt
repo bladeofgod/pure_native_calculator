@@ -64,7 +64,7 @@ target_link_libraries( # Specifies the target library.
                         android
                         native_app_glue
                         EGL
-                        GLESv1_CM
+                        GLESv3
 
                        # Links the target library to the log library
                        # included in the NDK.
