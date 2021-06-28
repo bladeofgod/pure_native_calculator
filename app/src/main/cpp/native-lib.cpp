@@ -9,7 +9,6 @@
 
 //draw ui
 #include <EGL/egl.h>
-#include "gl_painter.h"
 #include <GLES3/gl3.h>
 #include <GLES/gl.h>
 #include <GLES3/gl3ext.h>
@@ -29,6 +28,7 @@
 #include "rect_view.h"
 #include "offset.h"
 #include "view_util.h"
+#include "gl_painter.h"
 
 
 #define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO,"calculator-activity",__VA_ARGS__))
@@ -423,7 +423,8 @@ static void engine_draw_frame(struct engine * engine) {
 static void gl_draw(struct engine *engine) {
 
     //test method
-    gl_draw_triangle(engine);
+    //gl_draw_triangle(engine);
+    gl_draw_rect(engine);
 
 }
 
