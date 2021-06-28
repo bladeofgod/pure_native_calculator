@@ -8,32 +8,69 @@
 #include "gl_vertices.h"
 #include "rect_view.h"
 #include "offset.h"
+#include <cmath>
 
 /*
  *
- * @param1 rectView : a rect
- * @param2 width : screen width
- * @param3 height : screen height
+ * transform screen coordinator to opengl coordinator
  *
  */
 
-GlVertices* getRectVertices(RectView rectView,float width,float height) {
+class ViewUtil{
+public:
+    float screenWidth;
+    float screenHeight;
 
-    const float halfW = width / 2;
-    const float halfH = height / 2;
+    // middle of the screen
+    // offset(left,top)
+    Offset screenCenter;
 
-    float x = rectView.getPosition().x;
-    float y = rectView.getPosition().y;
+    ViewUtil():screenWidth(0.0),screenHeight(0.0),screenCenter(0.0,0.0){}
 
-    GlVertices leftTop = GlVertices();
+    ViewUtil(float width,float height) {
+        screenCenter = Offset(width/2,height/2);
+    }
 
-    GlVertices rect[4];
+    void getRectVertices(RectView rectView, GlVertices *rectLTRB) {
+
+        float x = rectView.getPosition().x;
+        float y = rectView.getPosition().y;
+        GlVertices leftTop = transformCSOffset(x,y);
+
+        float a = rectView.getPosition().x + rectView.getWidth();
+        float b = rectView.getPosition().y;
+        GlVertices rightTop = transformCSOffset(a,b);
+
+        float f = rectView.getPosition().x;
+        float g = rectView.getPosition().y + rectView.getHeight();
+        GlVertices leftBottom = transformCSOffset(f,g);
+
+        float j = rectView.getPosition().x + rectView.getWidth();
+        float k = rectView.getPosition().y + rectView.getHeight();
+        GlVertices rightBottom = transformCSOffset(j,k);
+
+        GlVertices rect[4] = {leftBottom,leftTop,rightBottom,rightTop};
+        for(int i = 0; i < 4; i++) {
+            *rectLTRB = rect[i];
+            rectLTRB ++;
+        }
+        //free(rect);
+    }
+
+private:
 
 
-}
+    /*
+     * transform coordinate system
+     */
+    GlVertices transformCSOffset(float x, float y) {
+        float left = (x - screenCenter.x) / screenCenter.x;
+        float top = (y - screenCenter.y) / screenCenter.y;
+        return GlVertices(left,top);
+    }
 
+};
 
-GlVertices getGlLeftTop() {}
 
 
 

@@ -28,6 +28,7 @@
 
 #include "rect_view.h"
 #include "offset.h"
+#include "view_util.h"
 
 
 #define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO,"calculator-activity",__VA_ARGS__))

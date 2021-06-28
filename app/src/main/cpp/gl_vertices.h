@@ -30,6 +30,14 @@ public:
         this->y = y;
         this->z = z;
     }
+
+    GlVertices& operator = (const GlVertices &glVertices){
+        this->x = glVertices.x;
+        this->y = glVertices.y;
+        this->z = glVertices.z;
+        return *this;
+    }
+
 };
 
 
