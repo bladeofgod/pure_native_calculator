@@ -250,6 +250,9 @@ static int engine_init_display(struct engine* engine) {
     engine->height = h;
     engine->state.angle = 0;
 
+    //init view util
+    ViewUtil::init(w,h);
+
     LOGI("egl surface size : width = %i  ,  height = %i",
          w,h);
 
@@ -425,7 +428,8 @@ static void gl_draw(struct engine *engine) {
 
     //test method
     //gl_draw_triangle(engine);
-    gl_draw_rect(engine);
+    //gl_draw_rect(engine);
+    gl_draw_some_rect(engine);
 
 }
 

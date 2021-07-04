@@ -82,8 +82,10 @@ void GlPainter::drawRect(GLfloat vVertices[4],struct Painter_Color *color, const
     // 7. 绘制矩形
     glDrawArrays(GL_LINE_LOOP, 0, 4);
 
-    eglSwapBuffers(engine->display,engine->surface);
+}
 
+void GlPainter::flushCanvas() {
+    eglSwapBuffers(engine->display,engine->surface);
 }
 
 

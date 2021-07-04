@@ -25,6 +25,8 @@ public:
     void drawRect(TextRectView rectView);
     void drawRect(GLfloat vVertices[4], struct Painter_Color *color , const std::string& text);
 
+    void flushCanvas();
+
     ~GlPainter();
 };
 
