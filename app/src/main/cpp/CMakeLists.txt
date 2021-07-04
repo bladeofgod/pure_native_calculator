@@ -34,7 +34,8 @@ add_library( # Sets the name of the library.
              SHARED
 
              # Provides a relative path to your source file(s).
-             native-lib.cpp )
+             native-lib.cpp
+            gl_painter.cpp)
 
 # set app-glue to native-lib
 target_include_directories(native-lib PRIVATE

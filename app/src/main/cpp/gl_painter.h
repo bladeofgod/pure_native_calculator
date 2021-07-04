@@ -5,21 +5,28 @@
 #ifndef PURENATIVECALCULATORDEMO_GL_PAINTER_H
 #define PURENATIVECALCULATORDEMO_GL_PAINTER_H
 
-struct Painter_Color{
-    float red;
-    float green;
-    float blue;
-    float alpha;
+#include <string>
+#include "app_engine.h"
+#include "rect_view.h"
+#include "text_rect_view.h"
+#include "view_util.h"
+#include "painter_color.h"
+
+
+class GlPainter{
+private:
+    struct engine* context;
+
+public:
+
+    GlPainter() = default;
+    GlPainter(engine *engine);
+    void drawRect(RectView rectView);
+    void drawRect(TextRectView rectView);
+    void drawRect(GLfloat vVertices[4], struct Painter_Color *color , const std::string& text);
+
+    ~GlPainter();
 };
-
-void drawRect(Painter_Color color , std::string text) {
-
-
-
-}
-
-
-
 
 
 

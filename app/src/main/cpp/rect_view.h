@@ -35,6 +35,14 @@ private:
     float bgColor[4];
 
 public:
+
+    /*
+     * @param : position = (left,top)
+     * @param : w = view's width
+     * @param : h = view's height
+     *
+     */
+
     RectView(float w,float h,Offset position,float bg[4]) {
         width = w;
         height = h;
