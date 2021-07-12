@@ -16,6 +16,12 @@ GlPainter::GlPainter(struct engine *engine) {
     this->context = engine;
 }
 
+GlPainter::~GlPainter() {
+    free(context);
+}
+
+
+
 void GlPainter::drawRect(RectView rectView) {
     //view 顶点
     GlVertices glVertices[4];
@@ -56,18 +62,18 @@ void GlPainter::drawRect(TextRectView rectView) {
 
     ViewUtil::get_instance()->getPainterColor(rectView.getBgColor(),&painterColor);
 
-    drawRect(ViewUtil::get_instance()->getRectVertices(rectView),rectView.getBgColor(),rectView.getText());
+    drawRect(v, &painterColor, rectView.getText());
 }
 
 void GlPainter::drawRect(GLfloat vVertices[4],struct Painter_Color *color, const std::string &text) {
 
 
     // 1. 通知OpenGL ES用于绘制的2D渲染表面的原点(x,y)坐标，宽度和高度
-    glViewport(0,0,engine->width,engine->height);
+    glViewport(0,0,context->width,context->height);
     // 2. 清除颜色缓冲区；有颜色、深度和模板缓冲区
     glClear(GL_COLOR_BUFFER_BIT);
     // 3. 将程序设置为活程序
-    glUseProgram(engine->programObject);
+    glUseProgram(context->programObject);
     // void glVertexAttribPointer (GLuint index, GLint size, GLenum type, GLboolean normalized,
     // GLsizei stride, const void *pointer);
     // index为第几个属性，属性有顶点的位置为0/纹理为1/法线为3；size为一个顶点所有数据的个数，这里XYZ为3个；
@@ -85,7 +91,7 @@ void GlPainter::drawRect(GLfloat vVertices[4],struct Painter_Color *color, const
 }
 
 void GlPainter::flushCanvas() {
-    eglSwapBuffers(engine->display,engine->surface);
+    eglSwapBuffers(context->display,context->surface);
 }
 
 

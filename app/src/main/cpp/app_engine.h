@@ -6,6 +6,7 @@
 #define PURENATIVECALCULATORDEMO_APP_ENGINE_H
 
 #include <android/sensor.h>
+#include <EGL/egl.h>
 
 struct saved_state {
     float angle;
