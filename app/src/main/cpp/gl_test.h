@@ -20,13 +20,13 @@ static void gl_draw_some_rect(struct engine *engine) {
             255,0,85,1
     };
 
-    static RectView r1(200,100,Offset(50,100),bg);
-    //RectView r2(200,100,Offset(150,100),bg);
+    static RectView r1(300,600,Offset(50,100),bg);
+    static RectView r2(300,600,Offset(400,700),bg);
 
     static GlPainter painter(engine);
 
     painter.drawRect(&r1);
-    //painter.drawRect(&r2);
+    painter.drawRect(&r2);
     painter.flushCanvas();
 
 

@@ -69,7 +69,6 @@ void GlPainter::drawRect(GLfloat *vVertices,struct Painter_Color *color, const s
 
     // 1. 通知OpenGL ES用于绘制的2D渲染表面的原点(x,y)坐标，宽度和高度
     glViewport(0,0,context->width,context->height);
-    glClearColor(255,255,255,1);
     // 2. 清除颜色缓冲区；有颜色、深度和模板缓冲区
     glClear(GL_COLOR_BUFFER_BIT);
     // 3. 将程序设置为活程序
