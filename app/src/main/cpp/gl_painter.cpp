@@ -27,20 +27,20 @@ void GlPainter::drawRect(RectView rectView) {
     GlVertices glVertices[4];
     memset(glVertices,0, 4 * sizeof(GlVertices));
     //获取顶点
-    ViewUtil::get_instance()->getRectVertices(rectView,glVertices);
+    ViewUtil::get_instance().getRectVertices(rectView,glVertices);
 
     //gl 顶点
     GLfloat v[12];
     memset(v,0, 12 * sizeof(GLfloat));
     //转换顶点
-    ViewUtil::get_instance()->transformGlVertices2float(glVertices,v);
+    ViewUtil::get_instance().transformGlVertices2float(glVertices,v);
 
     //转换颜色结构体
     struct Painter_Color painterColor{};
     //初始化一下
     memset(&painterColor,0,sizeof(Painter_Color));
 
-    ViewUtil::get_instance()->getPainterColor(rectView.getBgColor(),&painterColor);
+    ViewUtil::get_instance().getPainterColor(rectView.getBgColor(),&painterColor);
 
     drawRect(v, &painterColor, "");
 }
@@ -50,17 +50,17 @@ void GlPainter::drawRect(TextRectView rectView) {
     //转换顶点
     GlVertices glVertices[4];
     memset(glVertices,0, 4 * sizeof(GlVertices));
-    ViewUtil::get_instance()->getRectVertices(rectView,glVertices);
+    ViewUtil::get_instance().getRectVertices(rectView,glVertices);
 
     GLfloat v[12];
     memset(v,0,12*sizeof(GLfloat));
-    ViewUtil::get_instance()->transformGlVertices2float(glVertices,v);
+    ViewUtil::get_instance().transformGlVertices2float(glVertices,v);
 
     //转换颜色
     struct Painter_Color painterColor{};
     memset(&painterColor,0,sizeof(Painter_Color));
 
-    ViewUtil::get_instance()->getPainterColor(rectView.getBgColor(),&painterColor);
+    ViewUtil::get_instance().getPainterColor(rectView.getBgColor(),&painterColor);
 
     drawRect(v, &painterColor, rectView.getText());
 }

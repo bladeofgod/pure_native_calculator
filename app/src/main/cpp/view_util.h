@@ -22,6 +22,13 @@
 class ViewUtil{
 
 private:
+//    typedef std::shared_ptr<ViewUtil> Ptr;
+//    // lock_guard & mutext will work together
+//    // auto lock and unlock when deConstructor
+//    static std::mutex mutex;
+//
+//    static Ptr m_instance_ptr;
+
     ViewUtil() {
         std::cout<<"constructor called !"<<std::endl;
     }
@@ -35,8 +42,6 @@ private:
         this->screenHeight = height;
         screenCenter = Offset(width/2,height/2);
     }
-
-    static ViewUtil* m_instance_ptr;
 
     /*
      * transform coordinate system
@@ -59,17 +64,21 @@ public:
         std::cout<<"destructor called !"<<std::endl;
     }
 
+    //must call first
     static void init(float width,float height) {
-        if(m_instance_ptr == nullptr) {
-            m_instance_ptr = new ViewUtil(width,height);
-        }
+        static ViewUtil instance(width,height);
+//        //double check lock
+//        if(m_instance_ptr == nullptr) {
+//            std::lock_guard<std::mutex> lockGuard(mutex);
+//            if(m_instance_ptr == nullptr) {
+//                m_instance_ptr = std::shared_ptr<ViewUtil>(new ViewUtil(width,height));
+//            }
+//        }
     }
 
-    static ViewUtil* get_instance() {
-        if(m_instance_ptr == nullptr) {
-            m_instance_ptr = new ViewUtil(0,0);
-        }
-        return m_instance_ptr;
+    static ViewUtil& get_instance() {
+        static ViewUtil instance;
+        return instance;
     }
 
     /*
