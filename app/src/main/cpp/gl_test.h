@@ -12,18 +12,21 @@
 #include "gl_painter.h"
 
 
+ViewUtil::Ptr ViewUtil::m_instance_ptr = nullptr;
+std::mutex ViewUtil::mutex;
+
 static void gl_draw_some_rect(struct engine *engine) {
     float bg[4] = {
             255,0,85,1
     };
 
-    RectView r1(200,100,Offset(50,100),bg);
-    RectView r2(200,100,Offset(150,100),bg);
+    static RectView r1(200,100,Offset(50,100),bg);
+    //RectView r2(200,100,Offset(150,100),bg);
 
-    GlPainter painter(engine);
+    static GlPainter painter(engine);
 
-    painter.drawRect(r1);
-    painter.drawRect(r2);
+    painter.drawRect(&r1);
+    //painter.drawRect(&r2);
     painter.flushCanvas();
 
 

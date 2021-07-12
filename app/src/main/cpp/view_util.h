@@ -19,25 +19,21 @@
  *
  */
 
+
 class ViewUtil{
 
 private:
-//    typedef std::shared_ptr<ViewUtil> Ptr;
-//    // lock_guard & mutext will work together
-//    // auto lock and unlock when deConstructor
-//    static std::mutex mutex;
-//
-//    static Ptr m_instance_ptr;
 
     ViewUtil() {
         std::cout<<"constructor called !"<<std::endl;
     }
     //表示删除默认拷贝构造函数，即不能进行默认拷贝
-    ViewUtil(ViewUtil&)=delete;
+    ViewUtil(const ViewUtil&)=delete;
     //禁止赋值拷贝
     ViewUtil& operator=(const ViewUtil&)=delete;
 
     ViewUtil(float width,float height) {
+        std::cout<<"constructor called with params !"<<std::endl;
         this->screenWidth = width;
         this->screenHeight = height;
         screenCenter = Offset(width/2,height/2);
@@ -48,11 +44,18 @@ private:
      */
     GlVertices transformCSOffset(float x, float y) {
         float left = (x - screenCenter.x) / screenCenter.x;
-        float top = (y - screenCenter.y) / screenCenter.y;
+        float top = (screenCenter.y - y) / screenCenter.y;
         return GlVertices(left,top);
     }
 
 public:
+    typedef std::shared_ptr<ViewUtil> Ptr;
+
+    static Ptr m_instance_ptr;
+    // lock_guard & mutext will work together
+    // auto lock and unlock when deConstructor
+    static std::mutex mutex;
+
     float screenWidth;
     float screenHeight;
 
@@ -66,19 +69,18 @@ public:
 
     //must call first
     static void init(float width,float height) {
-        static ViewUtil instance(width,height);
+        std::cout<<"view util init called !" <<std::endl;
 //        //double check lock
-//        if(m_instance_ptr == nullptr) {
-//            std::lock_guard<std::mutex> lockGuard(mutex);
-//            if(m_instance_ptr == nullptr) {
-//                m_instance_ptr = std::shared_ptr<ViewUtil>(new ViewUtil(width,height));
-//            }
-//        }
+        if(m_instance_ptr == nullptr) {
+            std::lock_guard<std::mutex> lockGuard(mutex);
+            if(m_instance_ptr == nullptr) {
+                m_instance_ptr = std::shared_ptr<ViewUtil>(new ViewUtil(width,height));
+            }
+        }
     }
 
-    static ViewUtil& get_instance() {
-        static ViewUtil instance;
-        return instance;
+    static Ptr get_instance() {
+        return m_instance_ptr;
     }
 
     /*
@@ -86,22 +88,22 @@ public:
      *
      */
 
-    void getRectVertices(RectView rectView, GlVertices *rectLTRB) {
+    void getRectVertices(RectView *rectView, GlVertices *rectLTRB) {
 
-        float x = rectView.getPosition().x;
-        float y = rectView.getPosition().y;
+        float x = rectView->getPosition().x;
+        float y = rectView->getPosition().y;
         GlVertices leftTop = transformCSOffset(x,y);
 
-        float a = rectView.getPosition().x + rectView.getWidth();
-        float b = rectView.getPosition().y;
+        float a = rectView->getPosition().x + rectView->getWidth();
+        float b = rectView->getPosition().y;
         GlVertices rightTop = transformCSOffset(a,b);
 
-        float f = rectView.getPosition().x;
-        float g = rectView.getPosition().y + rectView.getHeight();
+        float f = rectView->getPosition().x;
+        float g = rectView->getPosition().y + rectView->getHeight();
         GlVertices leftBottom = transformCSOffset(f,g);
 
-        float j = rectView.getPosition().x + rectView.getWidth();
-        float k = rectView.getPosition().y + rectView.getHeight();
+        float j = rectView->getPosition().x + rectView->getWidth();
+        float k = rectView->getPosition().y + rectView->getHeight();
         GlVertices rightBottom = transformCSOffset(j,k);
 
         GlVertices rect[4] = {leftBottom,leftTop,rightBottom,rightTop};
@@ -141,7 +143,7 @@ public:
                     throw "color's value must smaller than 255";
                 }
             } else {
-                if(color[4] > 1) {
+                if(color[3] > 1) {
                     throw "alpha's value must smaller than 1";
                 }
             }

@@ -21,9 +21,9 @@ public:
 
     GlPainter() = default;
     GlPainter(engine *engine);
-    void drawRect(RectView rectView);
-    void drawRect(TextRectView rectView);
-    void drawRect(GLfloat vVertices[4], struct Painter_Color *color , const std::string& text);
+    void drawRect(RectView *rectView);
+    void drawRect(TextRectView *rectView);
+    void drawRect(GLfloat *vVertices, struct Painter_Color *color , const std::string& text);
 
     void flushCanvas();
 

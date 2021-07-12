@@ -22,54 +22,54 @@ GlPainter::~GlPainter() {
 
 
 
-void GlPainter::drawRect(RectView rectView) {
+void GlPainter::drawRect(RectView *rectView) {
     //view 顶点
     GlVertices glVertices[4];
     memset(glVertices,0, 4 * sizeof(GlVertices));
     //获取顶点
-    ViewUtil::get_instance().getRectVertices(rectView,glVertices);
+    ViewUtil::get_instance()->getRectVertices(rectView,glVertices);
 
     //gl 顶点
     GLfloat v[12];
     memset(v,0, 12 * sizeof(GLfloat));
     //转换顶点
-    ViewUtil::get_instance().transformGlVertices2float(glVertices,v);
+    ViewUtil::get_instance()->transformGlVertices2float(glVertices,v);
 
     //转换颜色结构体
     struct Painter_Color painterColor{};
     //初始化一下
     memset(&painterColor,0,sizeof(Painter_Color));
 
-    ViewUtil::get_instance().getPainterColor(rectView.getBgColor(),&painterColor);
+    ViewUtil::get_instance()->getPainterColor(rectView->getBgColor(),&painterColor);
 
     drawRect(v, &painterColor, "");
 }
 
-void GlPainter::drawRect(TextRectView rectView) {
+void GlPainter::drawRect(TextRectView *rectView) {
 
     //转换顶点
     GlVertices glVertices[4];
     memset(glVertices,0, 4 * sizeof(GlVertices));
-    ViewUtil::get_instance().getRectVertices(rectView,glVertices);
+    ViewUtil::get_instance()->getRectVertices(rectView,glVertices);
 
     GLfloat v[12];
     memset(v,0,12*sizeof(GLfloat));
-    ViewUtil::get_instance().transformGlVertices2float(glVertices,v);
+    ViewUtil::get_instance()->transformGlVertices2float(glVertices,v);
 
     //转换颜色
     struct Painter_Color painterColor{};
     memset(&painterColor,0,sizeof(Painter_Color));
 
-    ViewUtil::get_instance().getPainterColor(rectView.getBgColor(),&painterColor);
+    ViewUtil::get_instance()->getPainterColor(rectView->getBgColor(),&painterColor);
 
-    drawRect(v, &painterColor, rectView.getText());
+    drawRect(v, &painterColor, rectView->getText());
 }
 
-void GlPainter::drawRect(GLfloat vVertices[4],struct Painter_Color *color, const std::string &text) {
-
+void GlPainter::drawRect(GLfloat *vVertices,struct Painter_Color *color, const std::string &text) {
 
     // 1. 通知OpenGL ES用于绘制的2D渲染表面的原点(x,y)坐标，宽度和高度
     glViewport(0,0,context->width,context->height);
+    glClearColor(255,255,255,1);
     // 2. 清除颜色缓冲区；有颜色、深度和模板缓冲区
     glClear(GL_COLOR_BUFFER_BIT);
     // 3. 将程序设置为活程序
